@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Design handoff bundle — Babel/React-global prototypes, not linted.
+    "design_handoff_slopmerge/**",
   ]),
 ]);
 

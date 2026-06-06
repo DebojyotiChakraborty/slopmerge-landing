@@ -1,26 +1,163 @@
 @import "tailwindcss";
 
+/* ============================================================
+   THEME TOKENS (Tailwind v4) — translated from design-tokens.md.
+   Each --color-* becomes bg-*, text-*, border-* … utilities.
+   ============================================================ */
+@theme {
+  /* Candy palette */
+  --color-lav: #b8a8f0;
+  --color-lav-deep: #a493e8;
+  --color-brainrot: #c580fc;
+  --color-tile: #8a6bd2;
+  --color-tile-2: #7e5fcb;
+  --color-tile-stroke: #43377e;
+  --color-ink: #2e1e64;
+  --color-stroke: #695598;
+  --color-merge: #f2cc6e;
+  --color-merge-deep: #e0b248;
+  --color-green: #7dc242;
+  --color-green-deep: #5fa52c;
+  --color-green-stroke: #2e4d1a;
+  --color-sky-top: #a9bef8;
+  --color-sky-mid: #c7d2ea;
+  --color-sky-low: #e6deac;
+  --color-cool: #cfd8ee;
+
+  /* Fonts — wired to the next/font CSS vars applied on <html> */
+  --font-display: var(--font-changa), system-ui, cursive;
+  --font-sans: var(--font-grotesk), system-ui, sans-serif;
+
+  /* Radii */
+  --radius-chunk: 18px;
+  --radius-card: 24px;
+  --radius-modal: 28px;
+
+  /* Animation utilities (animate-bob, animate-marquee, …).
+     Keyframes themselves live at top level below so they are always emitted,
+     even when referenced via inline `animation` with per-instance params. */
+  --animate-bob: bob 4s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-twinkle: twinkle 1.8s ease-in-out infinite;
+  --animate-pop: pop 0.35s cubic-bezier(0.2, 1.4, 0.5, 1);
+}
+
+/* ------------------------------------------------------------
+   Keyframes (top-level → always present in output CSS).
+   Ported 1:1 from the prototype (sm-kit.jsx).
+   ------------------------------------------------------------ */
+@keyframes bob {
+  0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); }
+  50% { transform: translateY(-13px) rotate(var(--r2, 0deg)); }
+}
+@keyframes pop {
+  0% { transform: scale(0) rotate(-25deg); }
+  70% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+@keyframes merge-flash {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-9deg); }
+  75% { transform: rotate(9deg); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+@keyframes overflow-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+/* ------------------------------------------------------------
+   :root aliases — bare token names used by ported inline styles
+   and multi-stop gradients (v4 only auto-emits --color-* names).
+   ------------------------------------------------------------ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --lav: var(--color-lav);
+  --lav-deep: var(--color-lav-deep);
+  --brainrot: var(--color-brainrot);
+  --tile: var(--color-tile);
+  --tile-2: var(--color-tile-2);
+  --tile-stroke: var(--color-tile-stroke);
+  --ink: var(--color-ink);
+  --stroke: var(--color-stroke);
+  --merge: var(--color-merge);
+  --merge-deep: var(--color-merge-deep);
+  --green: var(--color-green);
+  --green-deep: var(--color-green-deep);
+  --green-stroke: var(--color-green-stroke);
+  --sky-top: var(--color-sky-top);
+  --sky-mid: var(--color-sky-mid);
+  --sky-low: var(--color-sky-low);
+  --cool: var(--color-cool);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ------------------------------------------------------------
+   Base
+   ------------------------------------------------------------ */
+html {
+  scroll-behavior: smooth;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-lav);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* ------------------------------------------------------------
+   Hand-written utilities Tailwind can't express cleanly.
+   ------------------------------------------------------------ */
+
+/* Stroked "sticker" display text. Per-instance stroke width via --sw. */
+@utility sticker {
+  font-family: var(--font-display);
+  line-height: 0.95;
+  paint-order: stroke fill;
+  -webkit-text-stroke: var(--sw, 6px) var(--color-stroke);
+  display: inline-block;
+}
+
+/* White sticker card: hard 3D bottom shadow + soft ambient + thick border. */
+@utility card {
+  background: #fff;
+  border-radius: var(--radius-card);
+  border: 3px solid var(--color-tile-stroke);
+  box-shadow:
+    0 6px 0 rgba(67, 55, 126, 0.22),
+    0 10px 24px rgba(46, 30, 100, 0.16);
+}
+
+/* ------------------------------------------------------------
+   Reduced motion — neutralize every loop/entrance animation.
+   Content stays fully visible and static.
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

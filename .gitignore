@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# design handoff (spec/reference bundle — not part of the app build;
+# assets already live in /public). Remove this line if you want it committed.
+/design_handoff_slopmerge/
