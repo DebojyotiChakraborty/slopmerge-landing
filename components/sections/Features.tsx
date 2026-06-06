@@ -57,27 +57,44 @@ export default function Features() {
           title="why it slaps"
           titleId="features-title"
         />
-        <div className="grid grid-cols-1 gap-[22px] min-[640px]:grid-cols-2 min-[1000px]:grid-cols-3">
-          {FEATS.map((f, i) => (
-            <div key={f.t} className="card flex flex-col items-start p-6">
-              <div className="mb-4 flex h-24 w-24 items-center justify-center rounded-[22px] border-[3px] border-tile-stroke bg-lav shadow-[0_5px_0_rgba(67,55,126,.2)]">
-                <FloatChar
-                  src={charSrc(f.img)}
-                  size={84}
-                  r={i % 2 ? 9 : -9}
-                  dur={4.2 + i * 0.25}
-                  delay={i * 0.15}
-                />
+        <div className="flex flex-col gap-6 min-[640px]:grid min-[640px]:grid-cols-2 min-[640px]:gap-[22px] min-[1000px]:grid-cols-3">
+          {FEATS.map((f, i) => {
+            const flip = i % 2 === 1;
+            return (
+              <div
+                key={f.t}
+                className={`flex items-center gap-4 ${
+                  flip ? "flex-row-reverse" : "flex-row"
+                } min-[640px]:flex-col min-[640px]:items-start min-[640px]:gap-0 min-[640px]:rounded-[24px] min-[640px]:border-[3px] min-[640px]:border-tile-stroke min-[640px]:bg-white min-[640px]:p-6 min-[640px]:shadow-[0_6px_0_rgba(67,55,126,.22),0_10px_24px_rgba(46,30,100,.16)]`}
+              >
+                <div className="flex size-[108px] shrink-0 items-center justify-center rounded-[22px] border-[3px] border-tile-stroke bg-lav shadow-[0_5px_0_rgba(67,55,126,.2)] min-[640px]:mb-4 min-[640px]:size-24">
+                  <FloatChar
+                    src={charSrc(f.img)}
+                    size={94}
+                    r={flip ? 9 : -9}
+                    dur={4.2 + i * 0.25}
+                    delay={i * 0.15}
+                    className="min-[640px]:!size-[84px]"
+                  />
+                </div>
+                <div
+                  className={`flex-1 ${
+                    flip ? "text-right" : "text-left"
+                  } min-[640px]:w-full min-[640px]:flex-none min-[640px]:text-left`}
+                >
+                  <div className="mb-1 text-[11px] font-bold uppercase tracking-[.14em] text-tile min-[640px]:mb-[5px]">
+                    {f.e}
+                  </div>
+                  <h3 className="font-display text-[20px] leading-[1.05] text-ink min-[640px]:text-[24px] min-[640px]:leading-[1.04]">
+                    {f.t}
+                  </h3>
+                  <p className="mt-[6px] text-[13.5px] leading-[1.5] text-[rgba(46,30,100,.72)] min-[640px]:mt-2 min-[640px]:text-[14.5px] min-[640px]:leading-[1.55]">
+                    {f.b}
+                  </p>
+                </div>
               </div>
-              <div className="mb-[5px] text-[11px] font-bold uppercase tracking-[.14em] text-tile">
-                {f.e}
-              </div>
-              <h3 className="font-display text-[24px] leading-[1.04] text-ink">{f.t}</h3>
-              <p className="mt-2 text-[14.5px] leading-[1.55] text-[rgba(46,30,100,.72)]">
-                {f.b}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Container>
     </section>

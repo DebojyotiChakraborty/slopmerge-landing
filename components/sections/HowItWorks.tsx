@@ -18,19 +18,28 @@ export default function HowItWorks() {
     >
       <Container>
         <SectionHead eyebrow="how it works" title="three taps to chaos" titleId="how-title" />
-        <div className="grid grid-cols-1 gap-5 min-[720px]:grid-cols-3">
+        <div className="grid grid-cols-1 gap-[14px] min-[720px]:grid-cols-3 min-[720px]:gap-5">
           {HOOKS.map((h, i) => (
-            <div key={h.t} className="card px-6 py-[26px] text-center">
+            <div
+              key={h.t}
+              className="card flex items-center gap-[14px] px-4 py-[14px] text-left min-[720px]:flex-col min-[720px]:items-stretch min-[720px]:px-6 min-[720px]:py-[26px] min-[720px]:text-center"
+            >
               <FloatChar
                 src={charSrc(h.img)}
                 size={92}
                 r={i % 2 ? 8 : -8}
                 dur={4 + i * 0.4}
                 delay={i * 0.2}
-                className="mx-auto mb-3"
+                className="!size-[58px] shrink-0 min-[720px]:mx-auto min-[720px]:mb-3 min-[720px]:!size-[92px]"
               />
-              <h3 className="font-display text-[26px] text-ink">{h.t}</h3>
-              <p className="mt-[6px] text-[15px] text-[rgba(46,30,100,.72)]">{h.d}</p>
+              <div>
+                <h3 className="font-display text-[21px] leading-none text-ink min-[720px]:text-[26px]">
+                  {h.t}
+                </h3>
+                <p className="mt-[3px] text-[13.5px] text-[rgba(46,30,100,.72)] min-[720px]:mt-[6px] min-[720px]:text-[15px]">
+                  {h.d}
+                </p>
+              </div>
             </div>
           ))}
         </div>

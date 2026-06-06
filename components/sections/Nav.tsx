@@ -30,10 +30,8 @@ export default function Nav() {
           </a>
         </div>
 
-        <div className="flex items-center gap-[14px]">
-          <div className="hidden min-[860px]:flex">
-            <SoundToggle />
-          </div>
+        <div className="flex items-center gap-[10px] min-[860px]:gap-[14px]">
+          <SoundToggle />
           <ChunkyButton theme="green" size="sm" onClick={openDownload}>
             Play Free
           </ChunkyButton>
