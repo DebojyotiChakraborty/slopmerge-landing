@@ -3,7 +3,6 @@
 import type { CSSProperties } from "react";
 import FloatChar from "@/components/ui/FloatChar";
 import ChunkyButton from "@/components/ui/ChunkyButton";
-import { StoreBadges } from "@/components/ui/StoreBadge";
 import Container from "@/components/ui/Container";
 import { useOverlay } from "@/components/overlays/OverlayProvider";
 import { charSrc } from "@/lib/characters";
@@ -55,7 +54,6 @@ export default function FinalCTA() {
           <ChunkyButton theme="gold" size="lg" onClick={openDownload}>
             Play Now
           </ChunkyButton>
-          <StoreBadges />
         </div>
       </Container>
     </section>

@@ -3,7 +3,6 @@
 import type { CSSProperties } from "react";
 import FloatChar from "@/components/ui/FloatChar";
 import ChunkyButton from "@/components/ui/ChunkyButton";
-import { StoreBadges } from "@/components/ui/StoreBadge";
 import Container from "@/components/ui/Container";
 import PhoneMockup from "./PhoneMockup";
 import { useOverlay } from "@/components/overlays/OverlayProvider";
@@ -94,10 +93,6 @@ export default function Hero() {
             >
               Watch It Cook
             </ChunkyButton>
-          </div>
-
-          <div className="mt-[18px] flex justify-center min-[980px]:justify-start">
-            <StoreBadges />
           </div>
         </div>
 

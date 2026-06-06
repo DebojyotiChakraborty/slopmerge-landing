@@ -25,7 +25,7 @@ export default function DownloadDialog({
             type="button"
             onClick={onClose}
             aria-label="close"
-            className="absolute right-3 top-3 flex h-[34px] w-[34px] items-center justify-center rounded-[11px] border-[2.5px] border-tile-stroke bg-white text-[17px] leading-none text-ink shadow-[0_3px_0_rgba(67,55,126,.25)]"
+            className="absolute right-3 top-3 z-10 flex h-[34px] w-[34px] items-center justify-center rounded-[11px] border-[2.5px] border-tile-stroke bg-white text-[17px] leading-none text-ink shadow-[0_3px_0_rgba(67,55,126,.25)]"
           >
             ×
           </button>
