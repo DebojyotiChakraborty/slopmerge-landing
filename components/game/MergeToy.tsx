@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { ROSTER } from "@/lib/characters";
 import { play } from "@/lib/sound";
 import Coin from "@/components/ui/Coin";
@@ -17,10 +17,11 @@ const MAXLEN = 6;
 const sizeFor = (t: number) => 30 + t * 7;
 
 /**
- * Interactive drop & merge toy. Tap Drop to add the previewed tier to the bin;
- * two adjacent matching tiers chain-merge into the next tier up (with a pop and
- * coins). Overstack past MAXLEN → STACK OVERFLOW!, shake, and auto-reset.
- * Reducer ported 1:1 from sm-kit.jsx.
+ * Interactive drop & merge toy. Tap Drop to add the previewed tier to the bin,
+ * or drag across the bin to aim and release to drop at that spot; two adjacent
+ * matching tiers chain-merge into the next tier up (with a pop and coins).
+ * Overstack past MAXLEN → STACK OVERFLOW!, shake, and auto-reset.
+ * Reducer ported from sm-kit.jsx, generalized to insert at any position.
  */
 export default function MergeToy({ height = 300 }: { height?: number }) {
   const [bin, setBin] = useState<Ball[]>([]);
@@ -30,29 +31,37 @@ export default function MergeToy({ height = 300 }: { height?: number }) {
   const [score, setScore] = useState(0);
   const [, setBest] = useState(0);
   const [over, setOver] = useState(false);
+  // x position (px, bin-local) of the aim ghost while dragging, null when idle
+  const [ghostX, setGhostX] = useState<number | null>(null);
   const idRef = useRef(1);
+  const stackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setNext(Math.floor(Math.random() * 3)));
     return () => cancelAnimationFrame(id);
   }, []);
 
-  const drop = useCallback(() => {
+  const dropAt = useCallback((index: number) => {
     if (over) return;
     play("drop");
     setBin((prev) => {
-      const arr: Ball[] = [...prev, { id: idRef.current++, tier: next, anim: "in" }];
+      const arr: Ball[] = [...prev];
+      let i = Math.max(0, Math.min(index, arr.length));
+      arr.splice(i, 0, { id: idRef.current++, tier: next, anim: "in" });
 
-      // chain-merge from the right
+      // chain-merge around the dropped ball (left neighbor first, then right)
       let merged = false;
       let gained = 0;
-      let i = arr.length - 1;
-      while (i > 0 && arr[i].tier === arr[i - 1].tier && arr[i].tier < TIERS.length - 1) {
+      for (;;) {
         const t = arr[i].tier;
-        arr.splice(i - 1, 2, { id: idRef.current++, tier: t + 1, anim: "merge" });
+        if (t >= TIERS.length - 1) break;
+        if (i > 0 && arr[i - 1].tier === t) {
+          arr.splice(--i, 2, { id: idRef.current++, tier: t + 1, anim: "merge" });
+        } else if (i < arr.length - 1 && arr[i + 1].tier === t) {
+          arr.splice(i, 2, { id: idRef.current++, tier: t + 1, anim: "merge" });
+        } else break;
         gained += (t + 2) * 2;
         merged = true;
-        i = arr.length - 1;
       }
 
       if (merged) {
@@ -77,6 +86,44 @@ export default function MergeToy({ height = 300 }: { height?: number }) {
     });
     setNext(Math.floor(Math.random() * 3));
   }, [next, over]);
+
+  // append at the end — same behavior the Drop button always had
+  const drop = useCallback(() => dropAt(Infinity), [dropAt]);
+
+  /** Insertion index for a drop at the given viewport x: count balls whose center is left of it. */
+  const indexFromX = (clientX: number) => {
+    const nodes = stackRef.current?.querySelectorAll("[data-ball]") ?? [];
+    let idx = 0;
+    nodes.forEach((n) => {
+      const r = n.getBoundingClientRect();
+      if (clientX > r.left + r.width / 2) idx++;
+    });
+    return idx;
+  };
+
+  const localX = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    return Math.max(18, Math.min(e.clientX - r.left, r.width - 18));
+  };
+
+  const onAimStart = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (over) return;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setGhostX(localX(e));
+  };
+
+  const onAimMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) setGhostX(localX(e));
+  };
+
+  const onAimEnd = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.hasPointerCapture(e.pointerId)) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    setGhostX(null);
+    dropAt(indexFromX(e.clientX));
+  };
+
+  const onAimCancel = () => setGhostX(null);
 
   const reset = () => {
     play("drop");
@@ -120,9 +167,13 @@ export default function MergeToy({ height = 300 }: { height?: number }) {
         </div>
       </div>
 
-      {/* the box / bin */}
+      {/* the box / bin — drag to aim, release to drop */}
       <div
-        className="relative overflow-hidden rounded-chunk border-[3px] border-tile-stroke"
+        onPointerDown={onAimStart}
+        onPointerMove={onAimMove}
+        onPointerUp={onAimEnd}
+        onPointerCancel={onAimCancel}
+        className="relative touch-none select-none overflow-hidden rounded-chunk border-[3px] border-tile-stroke cursor-grab active:cursor-grabbing"
         style={{
           height,
           background:
@@ -134,13 +185,35 @@ export default function MergeToy({ height = 300 }: { height?: number }) {
         {/* danger line */}
         <div className="pointer-events-none absolute inset-x-0 top-[30px] border-t-2 border-dashed border-white/50" />
 
+        {/* aim ghost while dragging */}
+        {ghostX !== null && !over && (
+          <div
+            className="pointer-events-none absolute inset-y-0 -translate-x-1/2"
+            style={{ left: ghostX }}
+          >
+            <div className="absolute inset-y-0 left-1/2 border-l-2 border-dashed border-white/40" />
+            <Image
+              src={TIERS[next].img}
+              alt=""
+              width={sizeFor(next)}
+              height={sizeFor(next)}
+              draggable={false}
+              className="relative mt-[8px] object-contain opacity-70"
+            />
+          </div>
+        )}
+
         {/* stacked balls (bottom-aligned, wrapping) */}
-        <div className="absolute inset-0 flex flex-wrap content-end justify-center gap-[6px] px-[12px] py-[10px]">
+        <div
+          ref={stackRef}
+          className="absolute inset-0 flex flex-wrap content-end justify-center gap-[6px] px-[12px] py-[10px]"
+        >
           {bin.map((b) => {
             const sz = sizeFor(b.tier);
             return (
               <div
                 key={b.id}
+                data-ball
                 style={{
                   width: sz,
                   height: sz,
@@ -156,6 +229,7 @@ export default function MergeToy({ height = 300 }: { height?: number }) {
                   alt=""
                   width={sz}
                   height={sz}
+                  draggable={false}
                   className="h-full w-full object-contain"
                 />
               </div>
@@ -163,9 +237,9 @@ export default function MergeToy({ height = 300 }: { height?: number }) {
           })}
         </div>
 
-        {bin.length === 0 && !over && (
+        {bin.length === 0 && !over && ghostX === null && (
           <div className="absolute inset-0 flex items-center justify-center text-[13px] font-bold tracking-[.06em] text-white opacity-85 [text-shadow:0_2px_4px_rgba(67,55,126,.5)]">
-            tap DROP to merge →
+            drag to aim · tap DROP to merge →
           </div>
         )}
 
