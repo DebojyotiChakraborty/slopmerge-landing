@@ -17,7 +17,7 @@ export const slug = (name: string): string =>
 export const charSrc = (name: string): string => `/characters/${slug(name)}.png`;
 
 /**
- * Merge-evolution chain for the playable MergeToy (small → big, 7 tiers).
+ * Merge-evolution chain (small → big, 7 tiers).
  * Order is significant: tier N fuses into tier N+1.
  */
 export const ROSTER: Character[] = [
