@@ -9,12 +9,12 @@ export type Character = {
   mode?: number;
 };
 
-/** "Tralalero Tralala" -> "tralalero-tralala" (matches public/characters/<slug>.png). */
+/** "Tralalero Tralala" -> "tralalero-tralala" (matches public/characters/<slug>.webp). */
 export const slug = (name: string): string =>
   name.toLowerCase().replace(/\s+/g, "-");
 
-/** Public path to a character sticker PNG. */
-export const charSrc = (name: string): string => `/characters/${slug(name)}.png`;
+/** Public path to a character sticker (512² WebP). */
+export const charSrc = (name: string): string => `/characters/${slug(name)}.webp`;
 
 /**
  * Merge-evolution chain (small → big, 7 tiers).

@@ -4,9 +4,9 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const SHOTS = [
-  "/screens/gameplay.png",
-  "/screens/modes.png",
-  "/screens/home.png",
+  "/screens/gameplay.webp",
+  "/screens/modes.webp",
+  "/screens/home.webp",
 ];
 
 type ShotReelProps = {
