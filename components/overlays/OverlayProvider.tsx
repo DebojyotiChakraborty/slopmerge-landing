@@ -4,6 +4,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import DownloadDialog from "./DownloadDialog";
 import RateCard from "./RateCard";
+import Toast from "./Toast";
 
 type OverlayApi = {
   openDownload: () => void;
@@ -46,6 +47,7 @@ export default function OverlayProvider({ children }: { children: ReactNode }) {
       {children}
       <DownloadDialog open={downloadOpen} onClose={api.closeDownload} />
       <RateCard open={rateOpen} onClose={api.closeRate} />
+      <Toast />
     </OverlayContext.Provider>
   );
 }

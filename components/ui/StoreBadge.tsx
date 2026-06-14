@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from "react";
 import { play } from "@/lib/sound";
+import { showToast } from "@/lib/toast";
 import { APP_STORE_URL, PLAY_STORE_URL } from "@/lib/links";
 
 /* MingCute apple-fill */
@@ -56,26 +57,22 @@ export default function StoreBadge({
   const apple = store === "apple";
   const url = apple ? APP_STORE_URL : PLAY_STORE_URL;
   const row = variant === "row";
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => {
-        play("drop");
-        if (url === "#") e.preventDefault(); // placeholder — see lib/links.ts
-      }}
-      aria-label={apple ? "Download on the App Store" : "Get it on Google Play"}
-      className={[
-        "inline-flex cursor-pointer items-center gap-[10px] bg-[#16111f] text-left text-white no-underline",
-        "rounded-[14px] border-[2.5px] border-[color:var(--stroke)]",
-        "shadow-[0_4px_0_#0c0913,0_8px_14px_rgba(46,30,100,.3)] transition-transform duration-[70ms]",
-        "active:translate-y-[3px] active:shadow-[0_1px_0_#0c0913,0_3px_8px_rgba(46,30,100,.3)]",
-        "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white",
-        row ? "w-full justify-start px-[18px] py-[13px]" : "px-[15px] py-[9px]",
-        className,
-      ].join(" ")}
-    >
+  const comingSoon = url === "#"; // no live listing yet — see lib/links.ts
+  const label = apple ? "App Store" : "Google Play";
+
+  const cls = [
+    "inline-flex cursor-pointer items-center gap-[10px] bg-[#16111f] text-left text-white no-underline",
+    "rounded-[14px] border-[2.5px] border-[color:var(--stroke)]",
+    "shadow-[0_4px_0_#0c0913,0_8px_14px_rgba(46,30,100,.3)] transition-transform duration-[70ms]",
+    "active:translate-y-[3px] active:shadow-[0_1px_0_#0c0913,0_3px_8px_rgba(46,30,100,.3)]",
+    "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-white",
+    row ? "w-full justify-start px-[18px] py-[13px]" : "px-[15px] py-[9px]",
+    comingSoon ? "opacity-50 grayscale" : "",
+    className,
+  ].join(" ");
+
+  const inner = (
+    <>
       {apple ? <AppleGlyph /> : <PlayGlyph />}
       <span className="flex flex-col">
         <span className="text-[9px] uppercase leading-none tracking-[.12em] opacity-[.78]">
@@ -85,10 +82,40 @@ export default function StoreBadge({
           className="mt-[2px] font-bold leading-[1.1]"
           style={{ fontSize: row ? 18 : 16 }}
         >
-          {apple ? "App Store" : "Google Play"}
+          {label}
         </span>
       </span>
       {row && <Chevron />}
+    </>
+  );
+
+  // Greyed-out "coming soon" store: a button that toasts instead of navigating.
+  if (comingSoon) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          play("drop");
+          showToast("Coming soon!");
+        }}
+        aria-label={`${label} — coming soon`}
+        className={cls}
+      >
+        {inner}
+      </button>
+    );
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={() => play("drop")}
+      aria-label={apple ? "Download on the App Store" : "Get it on Google Play"}
+      className={cls}
+    >
+      {inner}
     </a>
   );
 }
