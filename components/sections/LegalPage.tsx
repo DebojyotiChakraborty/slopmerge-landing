@@ -90,7 +90,7 @@ function renderInline(text: string): ReactNode[] {
 
 function Blocks({ blocks }: { blocks: LegalBlock[] }) {
   return (
-    <div className="space-y-[10px]">
+    <div className="space-y-[10px] break-words">
       {blocks.map((b, i) => {
         if (b.type === "h3") {
           return (
@@ -164,7 +164,7 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
 
             <hr className="my-[26px] border-t border-tile-stroke/15" />
 
-            <div className="grid gap-[26px]">
+            <div className="space-y-[26px]">
               {doc.sections.map((s) => (
                 <section key={s.h}>
                   <h2 className="mb-[8px] font-display text-[19px] leading-tight text-ink">
