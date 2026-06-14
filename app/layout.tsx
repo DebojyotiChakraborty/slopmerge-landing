@@ -3,6 +3,7 @@ import { changaOne, spaceGrotesk } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.slopmerge.fun"),
   title: "SlopMerge — merge the slop",
   description:
     "A physics-based merge game stuffed with certified Italian brainrot. Two of the same? They fuse. Free, offline, and dangerously replayable. 5 modes, 65 legends.",
@@ -19,8 +20,24 @@ export const metadata: Metadata = {
     title: "SlopMerge — merge the slop",
     description:
       "two of the same? they fuse. simple, addictive, completely unhinged. free, offline, dangerously replayable.",
+    url: "https://www.slopmerge.fun",
     siteName: "SlopMerge",
     type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1024,
+        height: 500,
+        alt: "SlopMerge — merge the Italian brainrot",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SlopMerge — merge the slop",
+    description:
+      "two of the same? they fuse. simple, addictive, completely unhinged. free, offline, dangerously replayable.",
+    images: ["/og.png"],
   },
 };
 
